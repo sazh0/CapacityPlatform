@@ -639,10 +639,21 @@ function Navbar({ scrolled, navigate }) {
 ═══════════════════════════════════════════════════════ */
 /* ─── Drop your video file in /public and pass the filename as videoSrc ─── */
 function HeroVideo({ src }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    video.muted = true          // must set muted in JS for iOS Safari
+    video.play().catch(() => { })  // silently ignore if browser still blocks
+  }, [src])
+
   return (
     <video
+      ref={videoRef}
       key={src}
       autoPlay muted loop playsInline
+      preload="auto"            // ← tell browser to load immediately
       style={{
         position: 'absolute',
         inset: 0,
@@ -651,15 +662,13 @@ function HeroVideo({ src }) {
         objectFit: 'cover',
         objectPosition: 'center',
         pointerEvents: 'none',
-        /* slight desaturation so text remains readable */
         filter: 'brightness(0.45) saturate(0.7)',
       }}>
-      {/* WebM first for best compression; MP4 as fallback */}
       {src.endsWith('.webm')
-        ? <><source src={src} type="video/webm" /></>
+        ? <source src={src} type="video/webm" />
         : src.endsWith('.mp4')
-          ? <><source src={src} type="video/mp4" /></>
-          : <><source src={src} /></>
+          ? <source src={src} type="video/mp4" />
+          : <source src={src} />
       }
     </video>
   )
