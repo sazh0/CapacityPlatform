@@ -698,6 +698,20 @@ function Hero({ navigate, videoSrc }) {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
+  // ← ADD THIS right here, after the scroll useEffect
+  useEffect(() => {
+    const video = document.querySelector('video')
+    if (!video) return
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        video.muted = true
+        video.play().catch(() => { })
+      }
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [])
+
   const intensity = hovered ? 1.7 : Math.max(0.55, 1 - scrollY / 500)
 
   const stats = [
