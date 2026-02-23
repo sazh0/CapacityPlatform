@@ -275,8 +275,8 @@ function DonutChart({ donut, defPct }) {
           </PieChart>
         </ResponsiveContainer>
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-52%)', textAlign: 'center', pointerEvents: 'none' }}>
-          <div style={{ fontSize: 26, fontWeight: 900, color: defPct > 50 ? T.dem : T.sup, lineHeight: 1 }}>{defPct}%</div>
-          <div style={{ fontSize: 8.5, color: T.txtDim, marginTop: 3, letterSpacing: .6, textTransform: 'uppercase' }}>عجز</div>
+          <div style={{ fontSize: 26, fontWeight: 900, color: defPct > 50 ? T.dem : T.sup, lineHeight: 1 }}>{defPct > 50 ? defPct : 100 - defPct}%</div>
+          <div style={{ fontSize: 8.5, color: T.txtDim, marginTop: 3, letterSpacing: .6, textTransform: 'uppercase' }}>{defPct > 50 ? 'عجز' : 'فائض'}</div>
         </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 6 }}>
@@ -298,7 +298,6 @@ function DonutChart({ donut, defPct }) {
    MINI CHART 2 — MONTHLY gap (bars + styled)
 ════════════════════════════════════════════════════════════════ */
 function MonthlyBarChart({ monthly, defPct }) {
-  const surPct = 100 - defPct
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null
     const v = payload[0]?.value
@@ -318,22 +317,8 @@ function MonthlyBarChart({ monthly, defPct }) {
     )
   }
   return (
-    <ChartCard title="مؤشر الفجوة الشهرية"
+    <ChartCard title="مؤشر الفجوة شهريًا"
       accent={T.bronze} className="monthly-chart-wide">
-
-      {/* ── Year distribution strip (replaces DonutChart) ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, padding: '6px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ fontSize: 10, color: T.txtDim, flexShrink: 0, fontWeight: 700 }}>توزيع أيام السنة</div>
-        <div style={{ flex: 1, height: 10, borderRadius: 6, overflow: 'hidden', display: 'flex', background: 'rgba(255,255,255,0.05)' }}>
-          <div style={{ width: `${defPct}%`, background: `linear-gradient(to right,${T.dem}cc,${T.dem})`, height: '100%', transition: 'width .6s ease', borderRadius: '6px 0 0 6px', boxShadow: `0 0 8px ${T.dem}55` }} />
-          <div style={{ width: `${surPct}%`, background: `linear-gradient(to left,${T.sup}cc,${T.sup})`, height: '100%', transition: 'width .6s ease', borderRadius: '0 6px 6px 0', boxShadow: `0 0 8px ${T.sup}55` }} />
-        </div>
-        <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
-          <span style={{ fontSize: 11, fontWeight: 900, color: T.dem }}>{defPct}% <span style={{ fontSize: 9, fontWeight: 400, color: T.txtDim }}>عجز</span></span>
-          <span style={{ fontSize: 10, color: T.txtDim, alignSelf: 'center' }}>·</span>
-          <span style={{ fontSize: 11, fontWeight: 900, color: T.sup }}>{surPct}% <span style={{ fontSize: 9, fontWeight: 400, color: T.txtDim }}>فائض</span></span>
-        </div>
-      </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, marginBottom: 8 }}>
         {[{ c: T.dem, l: 'عجز' }, { c: T.sup, l: 'فائض' }].map(x => (
@@ -347,8 +332,8 @@ function MonthlyBarChart({ monthly, defPct }) {
           <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.05)" horizontal={false} />
           <XAxis type="number" tick={{ fontFamily: 'Cairo,sans-serif', fontSize: 9.5, fill: T.txtDim }}
             axisLine={false} tickLine={false} tickFormatter={fmtK} />
-          <YAxis type="category" dataKey="name" tick={{ fontFamily: 'Cairo,sans-serif', fontSize: 9.5, fill: T.txtDim }}
-            axisLine={false} tickLine={false} width={40} />
+          <YAxis type="category" dataKey="name" tick={{ fontFamily: 'Cairo,sans-serif', fontSize: 10, fill: T.txtDim }}
+            axisLine={false} tickLine={false} width={60} />
           <ReferenceLine x={0} stroke="rgba(255,255,255,0.22)" strokeWidth={1.5} strokeDasharray="4 3" />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 4 }} wrapperStyle={{ zIndex: 9999 }} />
           <Bar dataKey="gap" radius={[0, 4, 4, 0]} maxBarSize={16}
@@ -392,7 +377,7 @@ function SeasonalRadialBar({ seasonal }) {
     )
   }
   return (
-    <ChartCard title="نسبة العجز الموسمي" accent={T.ram}>
+    <ChartCard title="أداء الطاقة الاستيعابية لكل موسم" accent={T.ram}>
       <div style={{ position: 'relative', paddingTop: '10px' }}>
         <ResponsiveContainer width="100%" height={160}>
           <RadialBarChart cx="50%" cy="50%" innerRadius="28%" outerRadius="92%"
@@ -1081,7 +1066,7 @@ function PageHeader({
             </div>
 
             {/* Scenario toggle pushed to end */}
-            <div style={{ marginRight: 'auto' }}>
+            <div style={{ marginRight: '0' }}>
               <button
                 className={`sc-toggle-btn${hasAnyScChange ? ' has-changes' : ''}${showSc ? ' active' : ''}`}
                 onClick={() => setShowSc(v => !v)}>
@@ -1318,10 +1303,14 @@ function Dashboard({ db }) {
   const peakDemand = useMemo(() => {
     const v = yrRows.filter(r => r.ado != null || r.adi != null)
     if (!v.length) return null
-    const best = v.reduce((m, r) => { const t = (r.ado ?? 0) + (r.adi ?? 0); return t > m.total ? { total: t, r } : m }, { total: -Infinity, r: null })
+    const best = v.reduce((m, r) => {
+      const t = (demTypes.has('outside') ? (r.ado ?? 0) : 0)
+        + (demTypes.has('inside') ? (r.adi ?? 0) : 0)
+      return t > m.total ? { total: t, r } : m
+    }, { total: -Infinity, r: null })
     if (!best.r) return null
     return { value: best.total, dateLabel: `${best.r.day} ${AR_MON[best.r.mo]} ${best.r.yr}`, isRamadan: best.r.isRamadan, isHajj: best.r.isHajj }
-  }, [yrRows])
+  }, [yrRows, demTypes])  // ← add demTypes
 
   /* Peak supply (adjusted asl+asf+ash) */
   const peakSupply = useMemo(() => {
@@ -1502,7 +1491,7 @@ function Dashboard({ db }) {
 
   const [showExport, setShowExport] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [showSc, setShowSc] = useState(false)
+  const [showSc, setShowSc] = useState(true)
   const hasAnyScChange = Object.values(sc).some(v => v !== 0)
   const activeScCount = Object.values(sc).filter(v => v !== 0).length
 
@@ -1616,6 +1605,7 @@ function Dashboard({ db }) {
             ════════════════════════════════════════ */}
             {series.length > 0 && (
               <div className="span-full mini-charts-row">
+                <DonutChart donut={mini.donut} defPct={mini.defPct} />
                 <MonthlyBarChart monthly={mini.monthly} defPct={mini.defPct} />
                 <DemandSplitChart split={mini.split} />
                 <SeasonalRadialBar seasonal={mini.seasonal} />

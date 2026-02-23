@@ -314,7 +314,7 @@ input {
 
 @media (min-width: 1200px) {
   .mini-charts-row {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1fr 1.8fr 1fr 1fr;
   }
 }
 
@@ -1049,7 +1049,7 @@ tbody tr:hover {
 
 @media (min-width: 1100px) {
   .mini-charts-row {
-    grid-template-columns: 2fr 1.2fr 1.2fr;
+    grid-template-columns: 1fr 1.8fr 1fr 1fr;
   }
 }
 
@@ -1478,14 +1478,6 @@ tbody tr:hover {
     display: none;
   }
 
-  /* Filters bar — stack vertically */
-  .page-header-filters {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 0;
-  }
-
   .ph-filter-group {
     width: 100%;
     gap: 7px;
@@ -1651,8 +1643,9 @@ tbody tr:hover {
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
-  padding: 12px 0;
+  padding: 16px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.055);
+  padding-right: 21%;
 }
 
 .ph-filter-group {
@@ -1743,5 +1736,28 @@ tbody tr:hover {
   .page-header-filters {
     gap: 12px;
     padding: 10px 0;
+  }
+}
+
+/* ── Desktop: scenario sidebar always visible ── */
+@media (min-width: 769px) {
+  .scenario-panel {
+    width: 296px !important;
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.55), 1px 0 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .scenario-sidebar {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+  }
+
+  /* Hide the toggle button — no need on desktop */
+  .sc-toggle-btn {
+    display: none;
+  }
+
+  /* Hide the close (X) button inside the sidebar */
+  .sidebar-close-btn {
+    display: none;
   }
 }
