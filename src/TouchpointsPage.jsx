@@ -140,7 +140,7 @@ function Navbar({ scrolled, navigate }) {
   return (
     <nav style={{
       position: 'fixed', top: 0, right: 0, left: 0, zIndex: 200,
-      background: scrolled ? '${C.charcoalD};' : 'transparent',
+      background: scrolled ? `${C.charcoalD}` : 'transparent',
       backdropFilter: scrolled ? 'blur(18px)' : 'none',
       transition: 'all 0.4s ease',
     }}>
@@ -223,7 +223,7 @@ function Navbar({ scrolled, navigate }) {
 
       {/* Mobile drawer — BUG FIX: was template literal string, not interpolated */}
       {mOpen && (
-        <div style={{ background: '${C.charcoalD};', backdropFilter: 'blur(18px)', padding: '18px 24px 24px' }}>
+        <div style={{ background: `${C.charcoalD}`, backdropFilter: 'blur(18px)', padding: '18px 24px 24px' }}>
           {['عن المنصة', 'الأسئلة الشائعة', 'تواصل معنا'].map(l => (
             <a
               key={l}
@@ -735,7 +735,7 @@ function GlassModal({ title, onClose }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '24px',
         animation: 'cl-fadeIn 0.22s ease',
-        background: '${C.charcoalD};',
+        background: `${C.charcoalD}`,
         backdropFilter: 'blur(20px)'
       }}
     >
@@ -750,7 +750,7 @@ function GlassModal({ title, onClose }) {
           overflow: 'hidden',
           animation: 'cl-fadeInUp 0.28s ease',
           position: 'relative',
-          background: '${C.charcoalD};',
+          background: `${C.charcoalD}`,
           backdropFilter: 'blur(20px)'
         }}
       >
