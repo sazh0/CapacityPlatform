@@ -644,8 +644,22 @@ function HeroVideo({ src }) {
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-    video.muted = true          // must set muted in JS for iOS Safari
-    video.play().catch(() => { })  // silently ignore if browser still blocks
+
+    // Wait for browser paint + short delay before forcing play
+    // This bypasses the "element not visible" autoplay block
+    const tryPlay = () => {
+      video.muted = true
+      video.play().catch(() => { })
+    }
+
+    // Double rAF ensures the DOM is fully painted
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        tryPlay()
+        // Also try again after 300ms as a safety net for slow connections
+        setTimeout(tryPlay, 300)
+      })
+    })
   }, [src])
 
   return (
@@ -653,7 +667,7 @@ function HeroVideo({ src }) {
       ref={videoRef}
       key={src}
       autoPlay muted loop playsInline
-      preload="auto"            // ← tell browser to load immediately
+      preload="auto"
       style={{
         position: 'absolute',
         inset: 0,
