@@ -1115,7 +1115,7 @@ function PageHeader({
 
               {/* ── Section 1: Supply ── */}
               <MethodSection icon="🏨" title="الطاقة الاستيعابية اليومية" accent={T.sup}>
-                <MethodFormula>الطاقة  = المرافق المرخّصة + المشاريع المستقبلية + مساكن الحجاج</MethodFormula>
+                <MethodFormula>الطاقة  =المرافق المرخّصة + المشاريع المستقبلية + مساكن الحجاج</MethodFormula>
                 <MethodTable rows={[
                   ['المرافق المرخّصة (sl)', 'القيمة الأساسية من البيانات', '637,360 سرير/يوم'],
                   ['المشاريع المستقبلية (sf)', 'تُضاف كمكوّن مستقل', '30,263 سرير مخطط'],
@@ -1507,7 +1507,6 @@ function Dashboard({ db }) {
   const activeScCount = Object.values(sc).filter(v => v !== 0).length
 
   useEffect(() => {
-    injectNavStyles()
     const fn = () => setScrolled(window.scrollY > 30)
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)

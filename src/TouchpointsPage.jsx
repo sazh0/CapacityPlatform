@@ -897,7 +897,6 @@ export default function TouchpointsPage() {
   const totalCount = TOUCHPOINTS.length
 
   useEffect(() => {
-    injectNavStyles()
     setMounted(true)
   }, [])
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import FAQ from "./faq";
+import './CapacityLanding.css'   // ← ADD THIS
 
 /* ═══════════════════════════════════════════════════════
    TOKENS
@@ -1200,7 +1201,6 @@ export default function CapacityLanding() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    injectStyles()
     const fn = () => setScrolled(window.scrollY > 30)
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
