@@ -1,5 +1,11 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  FaPlane, FaMosque, FaCity, FaBolt, FaPassport, FaExchangeAlt,
+  FaSyncAlt, FaRunning, FaHotel, FaWater, FaSatelliteDish, FaHospital,
+  FaStar, FaRegStar, FaTimes, FaClock, FaSearch,
+  FaMap, FaHandshake, FaClipboardList, FaLock,
+} from 'react-icons/fa'
 import { TOUCHPOINTS, SECTIONS, CITY_COLORS, QUICK_FILTERS, getSubsections } from './touchpoints.js'
 import './TouchpointsPage.css'
 
@@ -27,6 +33,32 @@ const C = {
   cream: '#F4F1EB',
   creamD: '#E8E4DA',
   white: '#FFFFFF',
+}
+
+// ─── Icon map — resolves string keys from touchpoints.js to react-icons ───
+const ICON_MAP = {
+  plane: FaPlane,
+  mosque: FaMosque,
+  city: FaCity,
+  bolt: FaBolt,
+  passport: FaPassport,
+  bridge: FaExchangeAlt,
+  rotate: FaSyncAlt,
+  running: FaRunning,
+  hotel: FaHotel,
+  water: FaWater,
+  satellite: FaSatelliteDish,
+  hospital: FaHospital,
+  map: FaMap,
+  handshake: FaHandshake,
+  clipboard: FaClipboardList,
+  lock: FaLock,
+}
+
+function TpIcon({ name, size = 18, color, style }) {
+  const Comp = ICON_MAP[name]
+  if (!Comp) return null
+  return <Comp size={size} color={color} style={style} />
 }
 
 // ─── Inject shared nav/global styles (same as CapacityLanding) ───
@@ -278,20 +310,20 @@ function TouchpointTile({ tp, pinned, onPin, onRemove, onClick, animDelay = 0 })
           onClick={e => { e.stopPropagation(); onPin(tp.id) }}
           aria-label={pinned ? 'إلغاء التثبيت' : 'تثبيت'}
           tabIndex={-1}
-        >{pinned ? '★' : '☆'}</button>
+        >{pinned ? <FaStar size={11} /> : <FaRegStar size={11} />}</button>
         {onRemove && (
           <button
             className="tp-tile-remove"
             onClick={e => { e.stopPropagation(); onRemove(tp.id) }}
             aria-label="حذف"
             tabIndex={-1}
-          >✕</button>
+          ><FaTimes size={10} /></button>
         )}
       </div>
 
       {/* Icon */}
       <div className="tp-tile-icon" style={{ background: sec?.accentDim, border: `1px solid ${sec?.accentBdr}` }}>
-        <span>{tp.icon}</span>
+        <TpIcon name={tp.icon} size={18} color={sec?.accent ?? C.grayXL} />
       </div>
 
       {/* Name */}
@@ -357,7 +389,7 @@ function SectionCard({ section, touchpoints, pinned, onPin, onSelect, defaultOpe
     >
       <button className="tp-section-header" onClick={() => setOpen(o => !o)} aria-expanded={open}>
         <div className="tp-section-icon-wrap">
-          <span className="tp-section-icon">{section.icon}</span>
+          <TpIcon name={section.icon} size={20} color={section.accent} />
         </div>
         <div className="tp-section-meta">
           <div className="tp-section-title">{section.title}</div>
@@ -401,7 +433,9 @@ function SectionCard({ section, touchpoints, pinned, onPin, onSelect, defaultOpe
 function EmptyState({ query }) {
   return (
     <div className="tp-empty">
-      <div className="tp-empty-icon">🔍</div>
+      <div className="tp-empty-icon">
+        <FaSearch size={44} color={`${C.grayXL}80`} />
+      </div>
       <div className="tp-empty-title">لا توجد نتائج</div>
       <div className="tp-empty-sub">لم يتم العثور على نقاط اتصال مطابقة لـ «{query}»</div>
       <div className="tp-empty-hint">جرّب كلمات أقصر أو استخدم الفلاتر السريعة</div>
@@ -580,7 +614,7 @@ function InlineSearch({ searchRef, query, setQuery }) {
             }}
             onMouseEnter={e => e.currentTarget.style.color = C.cream}
             onMouseLeave={e => e.currentTarget.style.color = C.grayL}
-          >✕</button>
+          ><FaTimes size={11} /></button>
         ) : (
           <span style={{
             fontSize: 13, color: C.gray,
@@ -634,7 +668,7 @@ const footerStyles = `
 
 const MODAL_CONTENT = {
   'نطاق الخدمة': {
-    icon: '🗺️',
+    icon: 'map',
     body: `تغطي منصة تحليل الطاقة الاستيعابية النطاق الجغرافي الكامل للمشاعر المقدسة وما يحيط بها، وتشمل:
 
 • **المسجد الحرام وساحاته** — تتبع الكثافة اللحظية وتحليل التدفق البشري في جميع الأروقة والمداخل.
@@ -646,7 +680,7 @@ const MODAL_CONTENT = {
 يُقدّم النطاق الخدمي بيانات مُجمَّعة ومُشفَّرة بالكامل، ولا تُتاح البيانات الفردية لأي طرف.`,
   },
   'ميثاق المستخدمين': {
-    icon: '🤝',
+    icon: 'handshake',
     body: `يُحدّد هذا الميثاق الإطار الأخلاقي والمهني الذي يلتزم به جميع مستخدمي المنصة:
 
 **الالتزامات الجوهرية**
@@ -663,7 +697,7 @@ const MODAL_CONTENT = {
 يخضع كل مستخدم للمراجعة الدورية، وتُعلَّق الحسابات عند ثبوت المخالفة. تحتفظ الجهة المشغّلة بسجلات التدقيق لمدة لا تقل عن ثلاث سنوات.`,
   },
   'شروط الاستخدام': {
-    icon: '📋',
+    icon: 'clipboard',
     body: `**١. قبول الشروط**
 باستخدامك لهذه المنصة، فإنك تُقرّ بقراءة هذه الشروط وفهمها والموافقة الكاملة على الالتزام بها.
 
@@ -680,7 +714,7 @@ const MODAL_CONTENT = {
 تحتفظ الجهة المشغّلة بحق تعديل هذه الشروط في أي وقت، مع إشعار المستخدمين المسجّلين قبل سبعة أيام على الأقل.`,
   },
   'سياسة الخصوصية': {
-    icon: '🔒',
+    icon: 'lock',
     body: `**البيانات التي نجمعها**
 تقتصر على بيانات تسجيل الدخول، وسجلات الجلسات، ومعرّفات الأجهزة — لأغراض الأمان والتدقيق حصراً.
 
@@ -762,7 +796,7 @@ function GlassModal({ title, onClose }) {
           direction: 'rtl',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 22 }}>{content.icon}</span>
+            <TpIcon name={content.icon} size={20} color={C.bronzeXL} />
             <span style={{ fontSize: 16, fontWeight: 800, color: C.cream }}>{title}</span>
           </div>
           <button
@@ -776,7 +810,7 @@ function GlassModal({ title, onClose }) {
             onMouseEnter={e => e.currentTarget.style.background = 'rgba(150,113,38,0.18)'}
             onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
             aria-label="إغلاق"
-          >✕</button>
+          ><FaTimes size={13} /></button>
         </div>
 
         {/* Body */}
@@ -1005,7 +1039,7 @@ export default function TouchpointsPage() {
             {pinnedTps.length > 0 && (
               <div className="tp-quick-row" style={{ marginBottom: 0 }}>
                 <div className="tp-quick-label" style={{ color: C.bronzeXL }}>
-                  <span>★</span> المثبّتة
+                  <FaStar size={11} color={C.bronzeXL} /> المثبّتة
                 </div>
                 <div className="tp-tiles-scroll">
                   {pinnedTps.map((tp, i) => (
@@ -1018,7 +1052,7 @@ export default function TouchpointsPage() {
             {recentTps.length > 0 && (
               <div className="tp-quick-row" style={{ marginBottom: 0 }}>
                 <div className="tp-quick-label" style={{ color: C.grayXL }}>
-                  <span>🕐</span> فتحتها مؤخراً
+                  <FaClock size={11} color={C.grayXL} /> فتحتها مؤخراً
                   <button
                     className="tp-recent-clear-all"
                     onClick={() => setRecent([])}

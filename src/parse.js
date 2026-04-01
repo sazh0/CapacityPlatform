@@ -2,13 +2,13 @@ import * as XLSX from 'xlsx'
 
 // ─── Ramadan & Hajj approximate dates ────────────────────────────
 export const RAMADAN = {
-  2026: { s: new Date(2026, 1, 18), e: new Date(2026, 2, 19) }, // Feb 18 → Mar 19 approx
-  2027: { s: new Date(2027, 1, 8), e: new Date(2027, 2, 9) }, // Feb 8 → Mar 9 approx
-  2028: { s: new Date(2028, 0, 28), e: new Date(2028, 1, 26) }, // Jan 28 → Feb 26 approx
-  2029: { s: new Date(2029, 0, 16), e: new Date(2029, 1, 14) }, // Jan 16 → Feb 14 approx
+  2026: { s: new Date(2026, 1, 18), e: new Date(2026, 2, 20) }, // Feb 18 → Mar 19 approx
+  2027: { s: new Date(2027, 1, 8), e: new Date(2027, 2, 10) }, // Feb 8 → Mar 9 approx
+  2028: { s: new Date(2028, 0, 28), e: new Date(2028, 1, 27) }, // Jan 28 → Feb 26 approx
+  2029: { s: new Date(2029, 0, 16), e: new Date(2029, 1, 15) }, // Jan 16 → Feb 14 approx
   2030: [
-    { s: new Date(2030, 0, 5), e: new Date(2030, 1, 3) }, // Ramadan #1
-    { s: new Date(2030, 11, 26), e: new Date(2031, 0, 24) }, // Ramadan #2
+    { s: new Date(2030, 0, 5), e: new Date(2030, 1, 4) }, // Ramadan #1
+    { s: new Date(2030, 11, 26), e: new Date(2031, 0, 25) }, // Ramadan #2
   ],
 };
 export const HAJJ = {
@@ -86,6 +86,35 @@ function sheet(wb, ...frags) {
   return null
 }
 
+// ─── Gregorian → Hijri string (e.g. "1447/08/18") ───────────────
+function toHijri(date) {
+  if (!date || isNaN(date)) return null
+  // Algorithm: civil Hijri approximation (Kuwaiti algorithm)
+  const jd = Math.floor((date - new Date(1970, 0, 1)) / 86400000) + 2440588
+  const l = jd - 1948440 + 10632
+  const n = Math.floor((l - 1) / 10631)
+  const l2 = l - 10631 * n + 354
+  const j = Math.floor((10985 - l2) / 5316) * Math.floor((50 * l2) / 17719)
+    + Math.floor(l2 / 5670) * Math.floor((43 * l2) / 15238)
+  const l3 = l2 - Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50)
+    - Math.floor(j / 16) * Math.floor((15238 * j) / 43) + 29
+  const m = Math.floor((24 * l3) / 709)
+  const d = l3 - Math.floor((709 * m) / 24)
+  const y = 30 * n + j - 30
+  return `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`
+}
+
+// ─── Parse hijriDate cell: serial number or raw string ──────────
+function parseHijriCell(v) {
+  if (v == null) return null
+  if (typeof v === 'number') {
+    // Excel serial → JS Date → Hijri string
+    const d = new Date((v - 25569) * 86400000)
+    return isNaN(d) ? null : toHijri(d)
+  }
+  return String(v).trim() || null
+}
+
 // ─── Number coercion ────────────────────────────────────────────
 function num(v) {
   if (v == null) return null
@@ -103,6 +132,7 @@ export function parseWorkbook(arrayBuffer) {
   const ensure = (d, key) => {
     if (!byDate[key]) byDate[key] = {
       date: d, key, yr: d.getFullYear(), mo: d.getMonth(), day: d.getDate(),
+      hijriDate: null,
       sl: null, sf: null, sh: null,
       do_: null, di: null,
       loadOut: null, loadInDay: null, loadInNight: null, insideDayPct: null,
@@ -120,6 +150,7 @@ export function parseWorkbook(arrayBuffer) {
     if (!d) return
     const yr = d.getFullYear(); if (yr < 2026 || yr > 2030) return
     const r = ensure(d, toKey(d))
+    const hd = col(row, 'التاريخ الهجري'); if (hd != null && r.hijriDate == null) r.hijriDate = parseHijriCell(hd)
     r.sl = num(col(row, 'الطاقة الاستيعابية للإيواء - مكة المكرمة (سرير في اليوم)', 'الطاقة الاستيعابية للإيواء - مكة المكرمة', 'الطاقة الاستيعابية للإيواء'))
     r.sf = num(col(row, 'المشاريع المستقبلية للإيواء - مكة المكرمة (سرير في اليوم)', 'المشاريع المستقبلية للإيواء - مكة المكرمة', 'المشاريع المستقبلية للإيواء', 'المشاريع المستقبلية'))
     r.sh = num(col(row, 'الطاقة الاستيعابية لمساكن الحجاج - مكة المكرمة (سرير / يوم)', 'الطاقة الاستيعابية لمساكن الحجاج - مكة المكرمة', 'مساكن الحجاج'))
@@ -133,6 +164,7 @@ export function parseWorkbook(arrayBuffer) {
     if (!d) return
     const yr = d.getFullYear(); if (yr < 2026 || yr > 2030) return
     const r = ensure(d, toKey(d))
+    const hd2 = col(row, 'التاريخ الهجري'); if (hd2 != null && r.hijriDate == null) r.hijriDate = parseHijriCell(hd2)
     r.do_ = num(col(row, 'إجمالي الطلب اليومي على الإيواء مكة المكرمة - المعتمرون من الخارج', 'المعتمرون من الخارج', 'معتمري الخارج'))
     r.di = num(col(row, 'إجمالي الطلب اليومي على الإيواء مكة المكرمة - المعتمرون من الداخل مبيت', 'المعتمرون من الداخل مبيت', 'معتمري الداخل مبيت'))
     r.loadOut = num(col(row, 'الحمل اليومي من معتمري الخارج -مكة المكرمة', 'الحمل اليومي من معتمري الخارج'))
@@ -149,7 +181,8 @@ export function parseWorkbook(arrayBuffer) {
     const r = byDate[toKey(d)]; if (!r) return
     r.bedsNonHajj = num(col(row, 'Makkah Total Beds / Room (Non-Hajj)', 'Makkah\nTotal Beds / Room\n(Non-Hajj)', 'Non-Hajj'))
     r.bedsHajj = num(col(row, 'Makkah Total Beds / Room (Hajj)', 'Makkah\nTotal Beds / Room\n(Hajj)', 'Hajj'))
-    r.utilPct = num(col(row, 'Makkah Accommodation Utilization %', 'Utilization %', 'Utilization'))
+    const uRaw = num(col(row, 'Makkah Accommodation Utilization %', 'Utilization %', 'Utilization'))
+    r.utilPct = uRaw != null ? (uRaw > 1 ? uRaw / 100 : uRaw) : null  // normalise to 0–1 decimal
   })
 
   /* DEMAND FACTORS (optional) */

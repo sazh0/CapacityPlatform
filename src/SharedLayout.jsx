@@ -60,14 +60,27 @@ export function Navbar({ scrolled, navigate }) {
           <button
             className="cl-btn-primary"
             onClick={() => navigate(-1)}
+            aria-label="رجوع"
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateX(-3px)'
+              e.currentTarget.style.color = C.greenL
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateX(0)'
+              e.currentTarget.style.color = C.cream
+            }}
             style={{
               ...base,
-              padding: '8px 22px', borderRadius: 8, fontSize: 13, fontWeight: 800,
-              background: `linear-gradient(135deg, ${C.green}, ${C.greenL})`,
-              color: 'white', border: 'none',
-              boxShadow: `0 4px 16px ${C.green}45`,
+              width: 42, height: 42, borderRadius: 12,
+              background: 'none', border: 'none',
+              color: C.cream,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
-          >نقاط الإتصال</button>
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
         </div>
 
         {/* Mobile hamburger */}
@@ -120,12 +133,27 @@ export function Navbar({ scrolled, navigate }) {
           <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
             <button
               onClick={() => navigate(-1)}
-              style={{
-                flex: 1, padding: '10px', background: C.green, color: 'white',
-                border: 'none', borderRadius: 8, fontFamily: 'inherit',
-                fontSize: 13, fontWeight: 700, cursor: 'pointer',
+              aria-label="رجوع"
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = C.greenL
+                e.currentTarget.style.color = C.greenL
               }}
-            >نقاط الإتصال</button>
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+                e.currentTarget.style.color = C.cream
+              }}
+              style={{
+                flex: 1, padding: '10px 16px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 10, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 8, fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
+                color: C.cream, transition: 'all 0.2s',
+              }}
+            >
+              العودة لنقاط الاتصال
+            </button>
           </div>
         </div>
       )}
